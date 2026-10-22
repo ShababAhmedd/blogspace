@@ -1,4 +1,4 @@
-const TOKEN_KEY = "blogspace_token";
+export const TOKEN_KEY = "blogspace_token";
 
 export const getToken = () => {
   if (typeof window === "undefined") return null;
@@ -25,12 +25,24 @@ export const removeToken = () => {
   }
 };
 
-// reads the JWT expiry without verifying it; the backend still verifies every request
-export const isTokenExpired = (token) => {
+// reads the JWT payload without verifying it; the backend still verifies every request
+const readPayload = (token) => {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
-    return !payload.exp || payload.exp * 1000 <= Date.now();
+    return JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
   } catch {
-    return true;
+    return null;
   }
+};
+
+// expiry time in milliseconds, or null if the token has none
+export const getTokenExpiry = (token) => {
+  const exp = readPayload(token)?.exp;
+  return exp ? exp * 1000 : null;
+};
+
+export const getTokenUserId = (token) => readPayload(token)?.id ?? null;
+
+export const isTokenExpired = (token) => {
+  const expiresAt = getTokenExpiry(token);
+  return !expiresAt || expiresAt <= Date.now();
 };

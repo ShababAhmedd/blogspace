@@ -2,6 +2,10 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
+// surrounding spaces don't change a search, so e.g. a trimmed URL value must not
+// overwrite the space someone just typed before pausing
+const sameSearch = (a, b) => a.trim() === b.trim();
+
 // keeps its own text while typing and reports it after a short pause (or on Enter)
 export default function SearchBar({
   value = "",
@@ -23,14 +27,14 @@ export default function SearchBar({
 
   // follow external changes, e.g. the other search box or browser back/forward
   useEffect(() => {
-    if (value !== lastSent.current) {
+    if (!sameSearch(value, lastSent.current)) {
       lastSent.current = value;
       setText(value);
     }
   }, [value]);
 
   useEffect(() => {
-    if (!autoSearch || text === lastSent.current) return;
+    if (!autoSearch || sameSearch(text, lastSent.current)) return;
     const timer = setTimeout(() => {
       lastSent.current = text;
       onSearchRef.current(text);

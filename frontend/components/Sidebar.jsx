@@ -58,8 +58,9 @@ export default function Sidebar({ open, onClose }) {
         onClick={onClose}
         aria-hidden="true"
       />
+      {/* a drawer on small screens; `invisible` keeps the closed drawer out of the tab order */}
       <aside
-        className={`fixed bottom-0 left-0 top-16 z-30 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform duration-200 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed bottom-0 left-0 top-16 z-30 flex w-64 flex-col border-r border-slate-200 bg-white transition-[translate,visibility] duration-200 lg:visible lg:translate-x-0 ${open ? "translate-x-0" : "invisible -translate-x-full"}`}
         aria-label="Dashboard navigation"
       >
         <nav className="flex-1 space-y-1 overflow-y-auto p-4">

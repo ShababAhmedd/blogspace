@@ -53,6 +53,7 @@ All data in the frontend comes from the REST API. Nothing is hardcoded or mocked
 - Every authenticated request checks that the account still exists and is active
 - Password reset links are single-use, expire after 15 minutes, and are stored hashed
 - Authentication state survives a page refresh. Protected routes redirect guests to `/login`, and admin routes show **Access Denied** to normal users.
+- The session ends when the token expires, even if the app is left idle, and logging out in one browser tab logs out the others
 - Validation on both sides: required fields, email, password length and confirmation, blog fields, and image type (JPG/PNG/WEBP/GIF) and size (≤ 2MB)
 - Readable error messages, loading skeletons, pending buttons that block double submits, empty states, toasts and confirmation dialogs
 - Responsive design: the Sidebar becomes a drawer on mobile, tables become cards, and forms fit the screen
@@ -92,7 +93,7 @@ blogspace/
     │                         # CategoryFilter, Loader, ConfirmDialog, Avatar, RouteGuards, ...
     ├── contexts/             # AuthContext, ToastContext
     ├── services/             # auth.service, user.service, blog.service
-    ├── hooks/                # usePageTitle, useUserStatus
+    ├── hooks/                # usePageTitle, useUserStatus, useResetOnHide
     ├── utils/                # api (Axios instance), auth (token storage), validation, format
     ├── screenshots/
     └── .env.example

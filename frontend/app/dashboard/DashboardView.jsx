@@ -35,6 +35,7 @@ export default function DashboardView() {
 
   useEffect(() => {
     let ignore = false;
+    setError("");
     const requests = [blogService.getBlogs(), isAdmin ? userService.getUsers() : Promise.resolve(null)];
     Promise.all(requests)
       .then(([blogData, userData]) => {
@@ -75,7 +76,7 @@ export default function DashboardView() {
       ) : (
         <>
           <div className={`grid gap-4 sm:grid-cols-2 ${isAdmin ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
-            <StatCard label="My Blogs" value={myBlogs.length} hint="Blogs you have published" />
+            <StatCard label={isAdmin ? "My Blogs" : "Total Blogs"} value={myBlogs.length} hint="Blogs you have published" />
             {isAdmin ? (
               <>
                 <StatCard label="Total Blogs" value={blogs.length} hint="Across all authors" />

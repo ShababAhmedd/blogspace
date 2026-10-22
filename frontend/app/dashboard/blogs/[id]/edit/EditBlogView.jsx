@@ -29,13 +29,20 @@ export default function EditBlogView() {
 
   useEffect(() => {
     let ignore = false;
+    // the page refetches each time it is shown again; errors from an earlier visit are cleared on success
     blogService
       .getBlogById(id)
-      .then((data) => !ignore && setBlog(data))
+      .then((data) => {
+        if (ignore) return;
+        setBlog(data);
+        setNotFound(false);
+        setError("");
+      })
       .catch((err) => {
         if (ignore) return;
-        if ([400, 404].includes(err.response?.status)) setNotFound(true);
-        else setError(getErrorMessage(err, "Could not load this blog."));
+        const missing = [400, 404].includes(err.response?.status);
+        setNotFound(missing);
+        setError(missing ? "" : getErrorMessage(err, "Could not load this blog."));
       })
       .finally(() => !ignore && setLoading(false));
     return () => {

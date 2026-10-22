@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Alert from "@/components/Alert";
 import Avatar from "@/components/Avatar";
@@ -30,17 +30,21 @@ export default function ManageBlogsView() {
   const [error, setError] = useState("");
   const [toDelete, setToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const latestRequest = useRef(0);
 
   const loadBlogs = useCallback(async () => {
+    // only the newest request may update the list, so a slow earlier search can't overwrite it
+    const request = ++latestRequest.current;
     setError("");
     try {
       const data = await blogService.getBlogs({ title, category });
+      if (request !== latestRequest.current) return;
       // the API returns every blog; normal users manage only their own
       setBlogs(isAdmin ? data : data.filter((blog) => blog.author?.id === user.id));
     } catch (err) {
-      setError(getErrorMessage(err, "Could not load blogs."));
+      if (request === latestRequest.current) setError(getErrorMessage(err, "Could not load blogs."));
     } finally {
-      setLoading(false);
+      if (request === latestRequest.current) setLoading(false);
     }
   }, [title, category, isAdmin, user.id]);
 

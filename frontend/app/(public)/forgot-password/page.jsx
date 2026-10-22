@@ -7,6 +7,7 @@ import AuthCard from "@/components/AuthCard";
 import Button from "@/components/Button";
 import FormField from "@/components/FormField";
 import usePageTitle from "@/hooks/usePageTitle";
+import useResetOnHide from "@/hooks/useResetOnHide";
 import authService from "@/services/auth.service";
 import { getErrorMessage } from "@/utils/api";
 import { validateEmail } from "@/utils/validation";
@@ -18,6 +19,12 @@ export default function ForgotPasswordPage() {
   const [serverError, setServerError] = useState("");
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  useResetOnHide(() => {
+    setSent(false);
+    setError("");
+    setServerError("");
+  });
 
   const handleSubmit = async (event) => {
     event.preventDefault();

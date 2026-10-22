@@ -11,6 +11,7 @@ import { GuestOnly } from "@/components/RouteGuards";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import usePageTitle from "@/hooks/usePageTitle";
+import useResetOnHide from "@/hooks/useResetOnHide";
 import { getErrorMessage } from "@/utils/api";
 import { hasErrors, validateEmail } from "@/utils/validation";
 
@@ -30,6 +31,13 @@ function LoginForm() {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // keep the email, but not the password or an old error, for the next visit
+  useResetOnHide(() => {
+    setValues((current) => ({ ...current, password: "" }));
+    setErrors({});
+    setServerError("");
+  });
 
   const registered = searchParams.get("registered");
   const reset = searchParams.get("reset");

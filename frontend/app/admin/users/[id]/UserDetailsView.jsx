@@ -33,16 +33,20 @@ export default function UserDetailsView() {
 
   useEffect(() => {
     let ignore = false;
+    // the page refetches each time it is shown again; errors from an earlier visit are cleared on success
     Promise.all([userService.getUserById(id), blogService.getBlogs()])
       .then(([userData, blogData]) => {
         if (ignore) return;
         setUser(userData);
         setBlogs(blogData.filter((blog) => blog.author?.id === userData.id));
+        setNotFound(false);
+        setError("");
       })
       .catch((err) => {
         if (ignore) return;
-        if ([400, 404].includes(err.response?.status)) setNotFound(true);
-        else setError(getErrorMessage(err, "Could not load this user."));
+        const missing = [400, 404].includes(err.response?.status);
+        setNotFound(missing);
+        setError(missing ? "" : getErrorMessage(err, "Could not load this user."));
       })
       .finally(() => !ignore && setLoading(false));
     return () => {

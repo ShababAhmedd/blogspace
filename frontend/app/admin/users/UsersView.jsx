@@ -38,9 +38,14 @@ export default function UsersView() {
 
   useEffect(() => {
     let ignore = false;
+    // the page refetches each time it is shown again; an error from an earlier visit is cleared on success
     userService
       .getUsers()
-      .then((data) => !ignore && setUsers(data))
+      .then((data) => {
+        if (ignore) return;
+        setUsers(data);
+        setError("");
+      })
       .catch((err) => !ignore && setError(getErrorMessage(err, "Could not load users.")))
       .finally(() => !ignore && setLoading(false));
     return () => {

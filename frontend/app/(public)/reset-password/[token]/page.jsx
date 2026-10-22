@@ -9,6 +9,7 @@ import Button from "@/components/Button";
 import FormField from "@/components/FormField";
 import { useToast } from "@/contexts/ToastContext";
 import usePageTitle from "@/hooks/usePageTitle";
+import useResetOnHide from "@/hooks/useResetOnHide";
 import authService from "@/services/auth.service";
 import { getErrorMessage } from "@/utils/api";
 import { PASSWORD_MIN_LENGTH } from "@/utils/constants";
@@ -23,6 +24,12 @@ export default function ResetPasswordPage() {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useResetOnHide(() => {
+    setValues({ password: "", confirmPassword: "" });
+    setErrors({});
+    setServerError("");
+  });
 
   const validate = (data) => ({
     password: validatePassword(data.password),

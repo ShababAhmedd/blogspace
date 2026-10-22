@@ -114,6 +114,7 @@ export default function ProfileView() {
         if (ignore) return;
         setProfile(data);
         setValues({ firstName: data.firstName || "", lastName: data.lastName || "" });
+        setLoadError("");
         updateUser(data);
       })
       .catch((err) => !ignore && setLoadError(getErrorMessage(err, "Could not load your profile.")))

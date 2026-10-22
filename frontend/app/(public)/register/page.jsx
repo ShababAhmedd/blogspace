@@ -10,6 +10,7 @@ import FormField from "@/components/FormField";
 import { GuestOnly } from "@/components/RouteGuards";
 import { useToast } from "@/contexts/ToastContext";
 import usePageTitle from "@/hooks/usePageTitle";
+import useResetOnHide from "@/hooks/useResetOnHide";
 import authService from "@/services/auth.service";
 import { getErrorMessage } from "@/utils/api";
 import { PASSWORD_MIN_LENGTH } from "@/utils/constants";
@@ -40,6 +41,14 @@ export default function RegisterPage() {
   const [touched, setTouched] = useState({});
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // keep a half-filled form, but not the passwords or an old error, for the next visit
+  useResetOnHide(() => {
+    setValues((current) => ({ ...current, password: "", confirmPassword: "" }));
+    setErrors({});
+    setTouched({});
+    setServerError("");
+  });
 
   const handleChange = (event) => {
     const next = { ...values, [event.target.name]: event.target.value };

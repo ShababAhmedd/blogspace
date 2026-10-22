@@ -7,6 +7,7 @@ import FormField from "@/components/FormField";
 import PageHeader from "@/components/PageHeader";
 import { useToast } from "@/contexts/ToastContext";
 import usePageTitle from "@/hooks/usePageTitle";
+import useResetOnHide from "@/hooks/useResetOnHide";
 import userService from "@/services/user.service";
 import { getErrorMessage } from "@/utils/api";
 import { PASSWORD_MIN_LENGTH } from "@/utils/constants";
@@ -22,6 +23,13 @@ export default function ChangePasswordView() {
   const [serverError, setServerError] = useState("");
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useResetOnHide(() => {
+    setValues(initial);
+    setErrors({});
+    setServerError("");
+    setSuccess("");
+  });
 
   const validate = (data) => ({
     password: validatePassword(data.password),

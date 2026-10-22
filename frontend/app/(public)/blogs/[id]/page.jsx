@@ -27,6 +27,8 @@ export default function BlogDetailsPage() {
   useEffect(() => {
     let ignore = false;
     setLoading(true);
+    setNotFound(false);
+    setError("");
     blogService
       .getBlogById(id)
       .then((data) => !ignore && setBlog(data))
