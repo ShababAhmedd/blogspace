@@ -1,0 +1,25 @@
+# dependencies
+node_modules/
+
+# environment files (only the examples are committed)
+.env
+.env*.local
+!.env.example
+
+# backend: uploaded profile images
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# frontend: Next.js build output
+frontend/.next/
+frontend/out/
+frontend/next-env.d.ts
+*.tsbuildinfo
+
+# logs and OS files
+npm-debug.log*
+.DS_Store
+coverage/
+
+# assignment brief
+ASSIGN.md
