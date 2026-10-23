@@ -7,6 +7,7 @@ import Alert from "@/components/Alert";
 import AuthCard from "@/components/AuthCard";
 import Button from "@/components/Button";
 import FormField from "@/components/FormField";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import usePageTitle from "@/hooks/usePageTitle";
 import useResetOnHide from "@/hooks/useResetOnHide";
@@ -20,6 +21,7 @@ export default function ResetPasswordPage() {
   const { token } = useParams();
   const router = useRouter();
   const toast = useToast();
+  const { isAuthenticated, endSession } = useAuth();
   const [values, setValues] = useState({ password: "", confirmPassword: "" });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
@@ -54,6 +56,12 @@ export default function ResetPasswordPage() {
     try {
       await authService.resetPassword(token, values.password);
       setValues({ password: "", confirmPassword: "" });
+      // the login page sends signed-in users away, so a session still open in this
+      // browser is ended first; the login page then shows the success message
+      if (isAuthenticated) {
+        endSession("/login?reset=1");
+        return;
+      }
       setSubmitting(false);
       toast.success("Password successfully changed.");
       router.replace("/login?reset=1");

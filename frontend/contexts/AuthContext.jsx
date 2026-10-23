@@ -95,10 +95,13 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const logout = useCallback(() => {
+  // signs out and opens `url`, e.g. the login page with a message after a password reset
+  const endSession = useCallback((url) => {
     removeToken();
-    leaveSession("/login");
+    leaveSession(url);
   }, []);
+
+  const logout = useCallback(() => endSession("/login"), [endSession]);
 
   const refreshUser = useCallback(async () => {
     const profile = await userService.getProfile();
@@ -119,10 +122,11 @@ export function AuthProvider({ children }) {
       isAdmin: user?.role === "admin",
       login,
       logout,
+      endSession,
       refreshUser,
       updateUser,
     }),
-    [user, loading, login, logout, refreshUser, updateUser],
+    [user, loading, login, logout, endSession, refreshUser, updateUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

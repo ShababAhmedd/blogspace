@@ -41,7 +41,7 @@ export const checkMailer = async () => {
 
   try {
     await createTransport().verify();
-    console.log(`[mail] ready to send password-reset emails as ${SMTP_USER} via ${SMTP_HOST}`);
+    console.log(`[mail] ready to send password-reset emails via ${SMTP_HOST}${SMTP_USER ? ` as ${SMTP_USER}` : ""}`);
   } catch (error) {
     console.error(`[mail] SMTP login failed: ${getErrorMessage(error)}`);
     console.error("[mail] password-reset emails can't be sent until the SMTP_* settings in backend/.env are fixed");
