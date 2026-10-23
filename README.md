@@ -17,6 +17,7 @@ All data in the frontend comes from the REST API. Nothing is hardcoded or mocked
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
+- [Password-Reset Emails](#password-reset-emails)
 - [Running the Application](#running-the-application)
 - [Seed Data and Demo Accounts](#seed-data-and-demo-accounts)
 - [Application Routes](#application-routes)
@@ -120,7 +121,7 @@ npm run install:all
 mysql -u root -p -e "CREATE DATABASE blogdb;"
 
 # 3. configure both apps
-cp backend/.env.example backend/.env              # then fill in DB settings and SECRET_KEY
+cp backend/.env.example backend/.env              # then fill in DB settings, SECRET_KEY and (to email reset links) SMTP
 cp frontend/.env.example frontend/.env.local
 
 # 4. (optional) add demo users and blogs
@@ -141,13 +142,37 @@ The real `.env` files are git-ignored; only the `.env.example` files are committ
 | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | MySQL connection                                         | `localhost`, `3306`, …  |
 | `SECRET_KEY`                                    | Secret used to sign JWTs                                           | a long random string    |
 | `CLIENT_URL`                                    | Frontend URL, used for CORS and password-reset links               | `http://localhost:3000` |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Email settings for reset links. Leave `SMTP_HOST` empty to print the links in the backend console instead. | — |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Email settings for password-reset links, see [Password-Reset Emails](#password-reset-emails). Leave `SMTP_HOST` empty to print the links in the backend console instead. | `smtp.gmail.com`, `587`, … |
 
 **`frontend/.env.local`**
 
 | Variable              | Description                    | Example                     |
 | --------------------- | ------------------------------ | --------------------------- |
 | `NEXT_PUBLIC_API_URL` | Base URL of the backend API    | `http://localhost:5000/api` |
+
+## Password-Reset Emails
+
+"Forgot Password?" emails the user a reset link that works once and expires after 15 minutes. The backend sends it through any SMTP server. To send it from a Gmail account:
+
+1. Turn on [2-Step Verification](https://myaccount.google.com/signinoptions/two-step-verification) for the Google account that will send the emails.
+2. Create an [App Password](https://myaccount.google.com/apppasswords) (any name, e.g. "BlogSpace"). Google shows a 16-character password such as `abcd efgh ijkl mnop`.
+3. Add these lines to `backend/.env`:
+
+   ```env
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your-address@gmail.com
+   SMTP_PASS=abcd efgh ijkl mnop
+   MAIL_FROM="BlogSpace <your-address@gmail.com>"
+   ```
+
+4. Restart the backend (`Ctrl+C`, then `npm run dev`). On startup it logs `[mail] ready to send password-reset emails as ...` when the login works, or `[mail] SMTP login failed: ...` with the reason.
+
+The configured account is only the sender: reset emails go to whatever address each user registered with, Gmail or not. A personal Gmail account can send about 500 emails a day. Other providers work the same way with their own SMTP host, port and credentials.
+
+Keep these settings in `backend/.env` only. It is git-ignored, and anyone who has the app password can send email as that account.
+
+If `SMTP_HOST` is empty, nothing is emailed. The backend prints each reset link in its console instead (search the output for `reset-password`), so the flow can still be tested locally. If sending fails, for example because of a wrong password, the user sees "Could not send the reset email, please try again later." and the backend console logs the reason.
 
 ## Running the Application
 

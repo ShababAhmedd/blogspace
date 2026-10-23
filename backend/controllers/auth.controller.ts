@@ -162,14 +162,22 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
     const resetUrl = `${clientUrl}/reset-password/${token}`;
-    await sendMail(
-      findUser.email,
-      "Reset your BlogSpace password",
-      `<p>Hi ${findUser.firstName},</p>
-       <p>Click the link below to reset your password. It expires in 15 minutes.</p>
-       <p><a href="${resetUrl}">${resetUrl}</a></p>
-       <p>If you did not request this, you can ignore this email.</p>`,
-    );
+    try {
+      await sendMail(
+        findUser.email,
+        "Reset your BlogSpace password",
+        `<p>Hi ${findUser.firstName},</p>
+         <p>Click the link below to reset your password. It expires in 15 minutes.</p>
+         <p><a href="${resetUrl}">${resetUrl}</a></p>
+         <p>If you did not request this, you can ignore this email.</p>`,
+      );
+    } catch (error) {
+      // e.g. wrong SMTP settings: the reason goes to the server console, not to the client
+      console.error(`[mail] could not send the reset email: ${getErrorMessage(error)}`);
+      return res.status(502).json({
+        message: "could not send the reset email, please try again later",
+      });
+    }
 
     res.status(200).json(reply);
   } catch (error) {
